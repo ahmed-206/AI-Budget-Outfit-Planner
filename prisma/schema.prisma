@@ -1,0 +1,142 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  price       Decimal
+
+  images String[] // multiple images
+  sizes  String[] // S M L XL
+  colors String[] // black white blue
+
+  stock Int
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+}
+
+model Category {
+  id    String @id @default(cuid())
+  name  String @unique
+  slug  String @unique
+  image String
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  clerkUserId     String
+  status          OrderStatus @default(PENDING)
+  totalAmount     Decimal
+  stripeSessionId String?
+
+  createdAt DateTime @default(now())
+
+  orderItems OrderItem[]
+
+  @@index([clerkUserId])
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+}
+
+model OrderItem {
+  id String @id @default(cuid())
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity Int
+  price    Decimal
+
+  size  String?
+  color String?
+}
+
+model Cart {
+  id          String @id @default(cuid())
+  clerkUserId String @unique
+
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([clerkUserId])
+}
+
+model CartItem {
+  id String @id @default(cuid())
+
+  cartId String
+  cart   Cart   @relation(fields: [cartId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity Int
+
+  size  String?
+  color String?
+}
+
+model User {
+  id               String   @id
+  email            String   @unique
+  username         String?  @unique
+  firstName        String?
+  lastName         String?
+  imageUrl         String?
+  
+  // SaaS Fields
+  plan             Plan     @default(FREE)
+  stripeCustomerId String?  @unique
+
+  recommendations  AIRecommendation[]
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+enum Plan {
+  FREE
+  PRO
+}
+
+model AIRecommendation {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id])
+  
+  occasion            String
+  budget              Decimal
+  suggestedProductIds String[]
+  explanation         String?
+  
+  createdAt           DateTime @default(now())
+}

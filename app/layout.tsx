@@ -39,7 +39,7 @@ export default async function RootLayout({
         {/* 2. الـ body يجب أن يحتوي على كل شيء يظهر أو يعمل في المتصفح */}
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           <NextTopLoader 
-            color="#000" 
+            color="#104F55" 
             initialPosition={0.08}
             crawlSpeed={200}
             height={3}

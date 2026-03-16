@@ -11,12 +11,14 @@ import { createCheckoutSession } from './lib/actions/checkout';
 interface CartProduct {
     name: string;
     price: number | string;
-    image: string;
+    images: string[];
 }
 
 interface CartItem {
     id: string;
     quantity: number;
+    size?: string | null; 
+    color?: string | null; 
     product: CartProduct;
 }
 
@@ -89,10 +91,9 @@ function CartSheet({ initialCart }: { initialCart?: CartWithItems | null }) {
         });
     };
 
-    return (
+  return (
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
-
-            <SheetTrigger >
+            <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative">
                     <ShoppingCart className="h-5 w-5" />
                     {itemCount > 0 && (
@@ -114,23 +115,43 @@ function CartSheet({ initialCart }: { initialCart?: CartWithItems | null }) {
                 <div className='flex-1 overflow-y-auto py-6'>
                     {loading ? (
                         <div className="flex justify-center py-8"><Loader2 className="animate-spin text-emerald-600" /></div>
-
-
                     ) : !cart || cart.items.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full text-muted-foreground space-y-4">
                             <ShoppingCart className="h-12 w-12 opacity-20" />
                             <p>Start adding fresh products!</p>
                         </div>
                     ) : (
-                        <ul className="space-y-4">
+                        <ul className="space-y-6">
                             {cart.items.map((item: CartItem) => (
-                                <li key={item.id} className="flex gap-4 items-center">
-                                    <div className="h-16 w-16 bg-gray-100 rounded-md overflow-hidden shrink-0">
-                                        <Image src={item.product.image} alt={item.product.name} width={64} height={64} className="h-full w-full object-cover" />
+                                <li key={item.id} className="flex gap-4 items-start">
+                                    <div className="h-20 w-20 bg-gray-100 rounded-lg overflow-hidden shrink-0 border">
+                                        {/* حل مشكلة الصورة باستخدام Optional Chaining */}
+                                        <Image 
+                                            src={item.product.images?.[0] || "/placeholder.jpg"} 
+                                            alt={item.product.name} 
+                                            width={80} 
+                                            height={80} 
+                                            className="h-full w-full object-cover" 
+                                        />
                                     </div>
-                                    <div className="flex-1">
-                                        <h4 className="font-medium text-sm line-clamp-1">{item.product.name}</h4>
-                                        <p className="text-sm text-muted-foreground">
+                                    <div className="flex-1 space-y-1">
+                                        <h4 className="font-bold text-sm line-clamp-1 text-brand-primary">{item.product.name}</h4>
+                                        
+                                        {/* عرض المقاس واللون المختارين */}
+                                        <div className="flex flex-wrap gap-2 text-[10px] font-semibold uppercase">
+                                            {item.size && (
+                                                <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-600 border">
+                                                    Size: {item.size}
+                                                </span>
+                                            )}
+                                            {item.color && (
+                                                <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-600 border flex items-center gap-1">
+                                                    Color: <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <p className="text-sm font-medium text-emerald-700">
                                             {item.quantity} x ${Number(item.product.price).toFixed(2)}
                                         </p>
                                     </div>
@@ -145,30 +166,28 @@ function CartSheet({ initialCart }: { initialCart?: CartWithItems | null }) {
                                 </li>
                             ))}
                         </ul>
-
                     )}
                 </div>
 
                 {cart && cart.items.length > 0 && (
-                    <SheetFooter className="border-t pt-6 sm:justify-center">
+                    <SheetFooter className="border-t pt-6">
                         <div className="w-full space-y-4">
-                            <div className="flex justify-between font-bold text-lg">
-                                <span>Total</span>
+                            <div className="flex justify-between font-bold text-xl text-brand-primary">
+                                <span>Subtotal</span>
                                 <span>${calculateTotal().toFixed(2)}</span>
                             </div>
                             <Button
-                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-12 text-lg"
+                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-12 text-lg font-bold shadow-lg"
                                 onClick={handleCheckout}
                                 disabled={isPending}
                             >
-                                {isPending ? <Loader2 className="animate-spin" /> : "Checkout"}
+                                {isPending ? <Loader2 className="animate-spin" /> : "Proceed to Checkout"}
                             </Button>
                         </div>
                     </SheetFooter>
                 )}
             </SheetContent>
         </Sheet>
-
     )
 
 }

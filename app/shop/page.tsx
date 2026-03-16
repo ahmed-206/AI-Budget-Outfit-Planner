@@ -80,7 +80,7 @@ async function ShopPage({ searchParams }: ShopPageProps) {
               >
                 <div className="aspect-square bg-gray-100 relative overflow-hidden">
                   <Image
-                    src={product.images[0]}
+                    src={product.images?.[0] || "/placeholder.jpg"}
                     alt={product.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -88,7 +88,7 @@ async function ShopPage({ searchParams }: ShopPageProps) {
                 </div>
                 <div className="p-4 flex flex-col flex-1">
                   <div className="text-xs text-gray-500 uppercase font-semibold mb-1">
-                     {product.category.name}
+                     {product.category?.name}
                   </div>
                   <h3 className="font-bold text-gray-900 line-clamp-1 mb-1">{product.name}</h3>
                   <div className="mt-auto pt-4 flex items-center justify-between">

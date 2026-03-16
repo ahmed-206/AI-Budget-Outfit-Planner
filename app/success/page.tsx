@@ -64,7 +64,9 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
                                     create: cart.items.map((item) => ({
                                         productId: item.productId,
                                         quantity: item.quantity,
-                                        price: item.product.price
+                                        price: item.product.price,
+                                        size: item.size,
+                                        color: item.color,
                                     }))
                                 }
                             },

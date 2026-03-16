@@ -5,8 +5,23 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from './ui/button'
 import CartSheet from './CartSheet'
-
-function Navbar({ cart }: { cart?: { id: string; items: { id: string; quantity: number; product: { name: string; price: number | string; image: string } }[] } | null }) {
+interface NavbarProps {
+  cart: {
+    id: string;
+    items: {
+      id: string;
+      quantity: number;
+      size?: string | null;
+      color?: string | null;
+      product: {
+        name: string;
+        price: number | string;
+        images: string[]; 
+      }
+    }[]
+  } | null;
+}
+function Navbar({ cart }: NavbarProps) {
 
   const { user, isLoaded } = useUser()
   return (
@@ -19,9 +34,9 @@ function Navbar({ cart }: { cart?: { id: string; items: { id: string; quantity: 
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-          <Link href="/" className="hover:text-emerald-600 transition-colors">Home</Link>
-          <Link href="/shop" className="hover:text-emerald-600 transition-colors">Shop</Link>
-          <Link href="/admin" className="hover:text-emerald-600 transition-colors">Dashboard</Link>
+          <Link href="/" className="text-brand-primary hover:text-brand-secondary transition-colors">Home</Link>
+          <Link href="/shop" className="text-brand-primary hover:text-brand-secondary transition-colors">Shop</Link>
+          <Link href="/admin" className="text-brand-primary hover:text-brand-secondary transition-colors">Dashboard</Link>
         </nav>
 
         <div className='flex items-center gap-4'>
@@ -37,7 +52,7 @@ function Navbar({ cart }: { cart?: { id: string; items: { id: string; quantity: 
                   />
                 </UserButton.MenuItems>
               </UserButton>
-              <CartSheet initialCart={cart} />
+              <CartSheet initialCart={cart || { id: "", items: [] }} />
             </>
           ) : isLoaded && (
             <>

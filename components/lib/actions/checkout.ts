@@ -30,7 +30,11 @@ export async function createCheckoutSession() {
             currency: "usd",
             product_data: {
                 name: item.product.name,
-                images: [item.product.image],
+                images: [item.product.images[0]],
+                metadata: {
+                size: item.size || "",
+                color: item.color || ""
+            }
             },
             unit_amount: Math.round(Number(item.product.price) * 100), // Stripe expects cents
         },
@@ -47,7 +51,14 @@ export async function createCheckoutSession() {
         cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/?canceled=true`,
         metadata: {
             userId: userId,
-            cartId: cart.id
+            cartId: cart.id,
+            orderData: JSON.stringify(cart.items.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.product.price.toString(),
+            size: item.size,
+            color: item.color
+        })))
         },
     });
 

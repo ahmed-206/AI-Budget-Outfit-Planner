@@ -1,5 +1,4 @@
 import { getAdminProducts, deleteProduct } from "@/components/lib/actions/admin-actions";
-import { formatCurrency } from "@/lib/utils"; // Assuming there's a format helper or we can use formatter
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -7,13 +6,15 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import EditProductModal from "@/components/EditProductModal";
+import { ProductWithCategory } from "@/types";
 
 export default async function ManageProductsPage() {
   const { userId } = await auth();
   if (!userId) return redirect("/sign-in");
 
   const res = await getAdminProducts();
-  const products = res.success ? res.products : [];
+  const rawProducts = res.success && res.products ? res.products : [];
+  const products: ProductWithCategory[] = JSON.parse(JSON.stringify(rawProducts));
 
   return (
     <div className='min-h-screen bg-gray-50 p-8'>
@@ -38,7 +39,7 @@ export default async function ManageProductsPage() {
                 </tr>
               </thead>
               <tbody>
-                {products?.map((product: any) => (
+                {products?.map((product) => (
                   <tr key={product.id} className="bg-white border-b hover:bg-gray-50">
                     <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-3">
                       {product.images?.[0] ? (
@@ -50,7 +51,7 @@ export default async function ManageProductsPage() {
                       )}
                       {product.name}
                     </td>
-                    <td className="px-6 py-4">{product.category.name}</td>
+                    <td className="px-6 py-4">{product.category?.name}</td>
                     <td className="px-6 py-4">${Number(product.price).toFixed(2)}</td>
                     <td className="px-6 py-4">{product.stock}</td>
                     <td className="px-6 py-4 text-right">

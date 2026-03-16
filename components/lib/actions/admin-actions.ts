@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
+import { ActionResponse, ProductWithCategory} from "@/types";
+import { ProductSchema } from "@/lib/validations/product";
 
 export async function getCategories() {
   try {
@@ -15,52 +17,25 @@ export async function getCategories() {
   }
 }
 
-export async function addProduct(formData: FormData) {
+export async function addProduct(formData: FormData): Promise<ActionResponse<ProductWithCategory>> {
   try {
-    const name = formData.get("name") as string;
-    const description = formData.get("description") as string;
-    const priceStr = formData.get("price") as string;
-    const price = parseFloat(priceStr);
-    const stockStr = formData.get("stock") as string;
-    const stock = parseInt(stockStr, 10);
-    const categoryId = formData.get("categoryId") as string;
+    // التحقق من البيانات
+    const validatedFields = ProductSchema.safeParse(Object.fromEntries(formData.entries()));
     
-    // Images: comma-separated URLs
-    const imagesStr = formData.get("images") as string;
-    const images = imagesStr ? imagesStr.split(",").map((s) => s.trim()).filter(Boolean) : [];
-    
-    // Sizes
-    const sizesStr = formData.get("sizes") as string;
-    const sizes = sizesStr ? sizesStr.split(",").map((s) => s.trim()).filter(Boolean) : [];
-    
-    // Colors
-    const colorsStr = formData.get("colors") as string;
-    const colors = colorsStr ? colorsStr.split(",").map((s) => s.trim()).filter(Boolean) : [];
-
-    if (!name || isNaN(price) || isNaN(stock) || !categoryId) {
-      return { success: false, error: "Missing required fields or invalid number format." };
+    if (!validatedFields.success) {
+      return { success: false, error: validatedFields.error.flatten().fieldErrors.name?.[0] || "Invalid data" };
     }
 
     const newProduct = await prisma.product.create({
-      data: {
-        name,
-        description: description || "",
-        price: price,
-        stock: stock,
-        categoryId,
-        images,
-        sizes,
-        colors,
-      },
+      data: validatedFields.data,
     });
 
     revalidatePath("/admin/products");
-    revalidatePath("/shop"); // Assuming there's a shop page
-
-    return { success: true, product: newProduct };
+    revalidatePath("/shop");
+    return { success: true, data: newProduct };
   } catch (error) {
-    console.error("Error adding product:", error);
-    return { success: false, error: "Failed to add product" };
+    console.error("CREATE_PRODUCT_ERROR:", error);
+    return { success: false, error: "Database error: Could not add product" };
   }
 }
 
@@ -102,54 +77,26 @@ export async function deleteProduct(id: string) {
   }
 }
 
-export async function editProduct(id: string, formData: FormData) {
+export async function editProduct(id: string, formData: FormData): Promise<ActionResponse<ProductWithCategory>> {
   try {
-    const name = formData.get("name") as string;
-    const description = formData.get("description") as string;
-    const priceStr = formData.get("price") as string;
-    const price = parseFloat(priceStr);
-    const stockStr = formData.get("stock") as string;
-    const stock = parseInt(stockStr, 10);
-    const categoryId = formData.get("categoryId") as string;
-    
-    // Images: comma-separated URLs
-    const imagesStr = formData.get("images") as string;
-    const images = imagesStr ? imagesStr.split(",").map((s) => s.trim()).filter(Boolean) : [];
-    
-    // Sizes
-    const sizesStr = formData.get("sizes") as string;
-    const sizes = sizesStr ? sizesStr.split(",").map((s) => s.trim()).filter(Boolean) : [];
-    
-    // Colors
-    const colorsStr = formData.get("colors") as string;
-    const colors = colorsStr ? colorsStr.split(",").map((s) => s.trim()).filter(Boolean) : [];
+    const rawData = Object.fromEntries(formData.entries());
+    const validated = ProductSchema.safeParse(rawData);
 
-    if (!name || isNaN(price) || isNaN(stock) || !categoryId) {
-      return { success: false, error: "Missing required fields or invalid number format." };
+    if (!validated.success) {
+      return { success: false, error: "بيانات غير صالحة" };
     }
 
     const updatedProduct = await prisma.product.update({
       where: { id },
-      data: {
-        name,
-        description: description || "",
-        price: price,
-        stock: stock,
-        categoryId,
-        images,
-        sizes,
-        colors,
-      },
-    });
+      data: validated.data, // هنا الـ Mapping تلقائي لأن Prisma update أكثر مرونة
+      include: { category: true }
+    }) as ProductWithCategory;
 
     revalidatePath("/admin/products");
-    revalidatePath(`/products/${id}`); // Adjust path as necessary
-    revalidatePath("/shop"); 
-
-    return { success: true, product: updatedProduct };
+    return { success: true, data: updatedProduct };
   } catch (error) {
-    console.error("Error editing product:", error);
-    return { success: false, error: "Failed to edit product" };
+    console.error("EDIT_PRODUCT_ERROR:", error);
+    return { success: false, error: "فشل تحديث البيانات" };
   }
 }
 

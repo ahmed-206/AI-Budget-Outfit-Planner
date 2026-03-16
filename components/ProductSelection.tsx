@@ -15,23 +15,28 @@ export default function ProductSelection({ productId, sizes, colors }: ProductSe
     const [selectedColor, setSelectedColor] = useState<string>(colors.length > 0 ? colors[0] : "");
 
     return (
-        <div className="space-y-6 pt-6 border-t border-gray-100">
-            {/* Sizes Display */}
+        <div className="space-y-8 pt-8 border-t border-brand-accent/20">
+            {/* Sizes Selection */}
             {sizes.length > 0 && (
-                <div>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-3">
-                        Available Sizes
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
+                <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-sm font-bold uppercase tracking-wider text-brand-primary">
+                            Select Size
+                        </h3>
+                        <button className="text-xs text-brand-secondary hover:underline font-medium">
+                            Size Guide
+                        </button>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
                         {sizes.map((size) => (
                             <button
                                 key={size}
                                 onClick={() => setSelectedSize(size)}
                                 className={cn(
-                                    "px-4 py-2 border rounded-md text-sm font-medium transition",
+                                    "min-w-[50px] h-11 px-3 flex items-center justify-center rounded-lg border-2 text-sm font-bold transition-all duration-300",
                                     selectedSize === size
-                                        ? "border-black bg-black text-white"
-                                        : "border-gray-200 hover:border-black"
+                                        ? "border-brand-primary bg-brand-primary text-white shadow-md scale-105"
+                                        : "border-gray-100 bg-white text-gray-600 hover:border-brand-accent hover:text-brand-primary"
                                 )}
                             >
                                 {size}
@@ -41,47 +46,61 @@ export default function ProductSelection({ productId, sizes, colors }: ProductSe
                 </div>
             )}
 
-            {/* Colors Display */}
+            {/* Colors Selection */}
             {colors.length > 0 && (
-                <div>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-3">
-                        Available Colors
+                <div className="animate-in fade-in slide-in-from-bottom-3 duration-700">
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-brand-primary mb-4">
+                        Available Colors: <span className="text-brand-secondary capitalize ml-1">{selectedColor}</span>
                     </h3>
-                    <div className="flex flex-wrap gap-3">
-                        {colors.map((color) => (
-                            <div key={color} className="flex flex-col items-center gap-1">
-                                <button
-                                    onClick={() => setSelectedColor(color)}
-                                    className={cn(
-                                        "w-8 h-8 rounded-full border cursor-pointer transition",
-                                        selectedColor === color
-                                            ? "ring-2 ring-offset-2 ring-black border-transparent"
-                                            : "border-gray-300 hover:scale-110"
+                    <div className="flex flex-wrap gap-4">
+                        {colors.map((color) => {
+                            const isSelected = selectedColor === color;
+                            return (
+                                <div key={color} className="relative group">
+                                    <button
+                                        onClick={() => setSelectedColor(color)}
+                                        className={cn(
+                                            "w-9 h-9 rounded-full border-2 transition-all duration-300 relative z-10",
+                                            isSelected 
+                                                ? "border-white ring-2 ring-brand-primary scale-110 shadow-sm" 
+                                                : "border-transparent hover:scale-110"
+                                        )}
+                                        style={{
+                                            backgroundColor: color.includes("#") ? color : color.toLowerCase(),
+                                        }}
+                                        title={color}
+                                    />
+                                    {/* تلميح صغير عند الوقوف بالماوس */}
+                                    {!color.includes("#") && (
+                                        <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-medium text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            {color}
+                                        </span>
                                     )}
-                                    style={{
-                                        backgroundColor: color.includes("#")
-                                            ? color
-                                            : color.toLowerCase(),
-                                    }}
-                                    title={color}
-                                />
-                                <span className="text-[10px] text-gray-500">
-                                    {color.includes("#") ? "" : color}
-                                </span>
-                            </div>
-                        ))}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             )}
 
-            <div className="pt-8">
+            {/* Action Area */}
+            <div className="pt-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
                 <AddToCartButton
                     productId={productId}
                     selectedSize={selectedSize}
                     selectedColor={selectedColor}
                     size="lg"
-                    className="w-full md:w-auto bg-black hover:bg-gray-800 text-white min-w-[200px] rounded-full"
+                    className={cn(
+                        "w-full md:w-full h-14 text-base font-bold uppercase tracking-widest transition-all duration-500",
+                        "bg-brand-primary hover:bg-brand-secondary text-white rounded-xl",
+                        "shadow-lg hover:shadow-brand-secondary/20 hover:-translate-y-1 active:translate-y-0"
+                    )}
                 />
+                
+                <p className="text-center text-xs text-gray-400 mt-4 flex items-center justify-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                    Secure payment & Free shipping on orders over $150
+                </p>
             </div>
         </div>
     );

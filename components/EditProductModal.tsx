@@ -10,11 +10,15 @@ import { editProduct, getCategories } from "@/components/lib/actions/admin-actio
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Pencil } from "lucide-react";
+import { Category, ProductWithCategory } from "@/types";
 
-export default function EditProductModal({ product }: { product: any }) {
+interface Props {
+  product: ProductWithCategory;
+}
+export default function EditProductModal({ product }:  Props ) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     async function loadCategories() {
@@ -40,7 +44,7 @@ export default function EditProductModal({ product }: { product: any }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+      <DialogTrigger>
         <Button variant="outline" size="sm" className="gap-2 text-blue-600 hover:text-blue-700">
           <Pencil className="w-4 h-4" /> Edit
         </Button>

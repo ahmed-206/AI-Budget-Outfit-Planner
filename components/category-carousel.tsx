@@ -3,9 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
-
 import { Category } from "@prisma/client"
-
 import { Card, CardContent } from "@/components/ui/card"
 import {
     Carousel,
@@ -15,7 +13,6 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel"
 
-
 interface CategoryCarouselProps {
     categories: Category[]
 }
@@ -23,17 +20,14 @@ interface CategoryCarouselProps {
 export function CategoryCarousel({ categories }: CategoryCarouselProps) {
     return (
         <div className="w-full relative">
-            <div className="flex justify-between items-end mb-8 px-1">
-                <div>
-                    <h2 className="text-3xl font-bold text-gray-900">Shop by Category</h2>
-                    <p className="text-gray-600 mt-2">Explore our wide range of fresh products.</p>
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10 px-1 gap-4">
+                <div className="text-center md:text-left">
+                    <h2 className="text-3xl font-bold text-brand-primary tracking-tight">Shop by Category</h2>
+                    <p className="text-gray-500 mt-2">Discover our curated collections for every occasion.</p>
                 </div>
-                <div className="hidden md:flex gap-2">
-                    {/* Custom navigation buttons will be handled by CarouselNext/Previous if needed, 
-                     but standard Shadcn Carousel puts them on the sides or we can style them.
-                     Let's use the default absolute positioning for now or customize them.
-                 */}
-                </div>
+                
+                {/* Custom Indicators/Navigation can be added here */}
             </div>
 
             <Carousel
@@ -43,27 +37,30 @@ export function CategoryCarousel({ categories }: CategoryCarouselProps) {
                 }}
                 className="w-full"
             >
-                <CarouselContent className="-ml-2 md:-ml-4">
+                <CarouselContent className="-ml-4">
                     {categories.map((category) => (
-                        <CarouselItem key={category.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+                        <CarouselItem key={category.id} className="pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
                             <Link href={`/products?category=${category.slug}`} className="group block h-full">
-                                <Card className="h-full border-2 border-transparent hover:border-emerald-100 transition-all duration-300 hover:shadow-lg rounded-2xl overflow-hidden bg-white">
+                                <Card className="h-full border-none shadow-none bg-transparent overflow-hidden">
                                     <CardContent className="p-0 flex flex-col h-full">
-                                        <div className="relative aspect-square overflow-hidden bg-emerald-50">
+                                        {/* Image Circle Container */}
+                                        <div className="relative aspect-square rounded-xl overflow-hidden bg-brand-accent/5 border border-brand-accent/10 transition-all duration-500 group-hover:shadow-xl group-hover:border-brand-secondary/30">
                                             <Image
-                                                src={category.image || "https://via.placeholder.com/150"}
+                                                src={category.image || "https://via.placeholder.com/300"}
                                                 alt={category.name}
-                                                width={150}
-                                                height={150}
-                                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                fill
+                                                className="object-cover transition-transform duration-700 group-hover:scale-110"
                                             />
-                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                                            {/* Overlay Effect */}
+                                            <div className="absolute inset-0 bg-brand-primary/0 group-hover:bg-brand-primary/10 transition-colors duration-500" />
                                         </div>
-                                        <div className="p-4 text-center">
-                                            <h3 className="font-semibold text-emerald-600 transition-colors text-lg">
+                                        
+                                        {/* Category Name */}
+                                        <div className="mt-6 text-center">
+                                            <h3 className="font-bold text-brand-primary group-hover:text-brand-secondary transition-colors text-lg">
                                                 {category.name}
                                             </h3>
-
+                                            <div className="w-0 group-hover:w-12 h-0.5 bg-brand-secondary mx-auto mt-2 transition-all duration-500" />
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -71,9 +68,11 @@ export function CategoryCarousel({ categories }: CategoryCarouselProps) {
                         </CarouselItem>
                     ))}
                 </CarouselContent>
-                <div className="hidden md:block">
-                    <CarouselPrevious className="-left-4 lg:-left-12 h-10 w-10 border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-300" />
-                    <CarouselNext className="-right-4 lg:-right-12 h-10 w-10 border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-300" />
+
+                {/* Navigation Buttons Styled */}
+                <div className="flex justify-center md:block">
+                    <CarouselPrevious className="hidden md:flex -left-6 lg:-left-12 h-12 w-12 bg-white border-brand-accent/20 text-brand-primary hover:bg-brand-primary hover:text-white transition-all shadow-sm" />
+                    <CarouselNext className="hidden md:flex -right-6 lg:-right-12 h-12 w-12 bg-white border-brand-accent/20 text-brand-primary hover:bg-brand-primary hover:text-white transition-all shadow-sm" />
                 </div>
             </Carousel>
         </div>

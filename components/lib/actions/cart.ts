@@ -107,30 +107,26 @@ export async function addToCart(productId: string, quantity: number = 1, size?: 
 
 
 // AI For adding to cart
-export async function addAllToCart(items: { productId: string; quantity: number }[]) {
+
+export async function addAllToCart(items: { productId: string; quantity: number; size?: string; color?: string }[]) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
-    // 1. Get or Create Cart (Reusing logic from addToCart essentially)
-    let cart = await prisma.cart.findUnique({
-        where: { clerkUserId: userId },
-    });
-
+    let cart = await prisma.cart.findUnique({ where: { clerkUserId: userId } });
     if (!cart) {
-        cart = await prisma.cart.create({
-            data: { clerkUserId: userId },
-        });
+        cart = await prisma.cart.create({ data: { clerkUserId: userId } });
     }
 
-    // 2. Process all items
-    // Using a transaction would be ideal, but parallel promises are fine for this scale
     const cartId = cart.id;
 
     await Promise.all(items.map(async (item) => {
+        // البحث عن منتج بنفس المواصفات تماماً (المقاس واللون)
         const existingItem = await prisma.cartItem.findFirst({
             where: {
                 cartId: cartId,
                 productId: item.productId,
+                size: item.size || null,
+                color: item.color || null,
             },
         });
 
@@ -145,10 +141,11 @@ export async function addAllToCart(items: { productId: string; quantity: number 
                     cartId: cartId,
                     productId: item.productId,
                     quantity: item.quantity,
+                    size: item.size || null,   
+                    color: item.color || null, 
                 },
             });
         }
     }));
-
     return { success: true };
 }

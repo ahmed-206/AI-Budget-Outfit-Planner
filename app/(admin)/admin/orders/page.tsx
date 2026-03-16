@@ -1,5 +1,4 @@
 import { getAdminOrders } from "@/components/lib/actions/admin-actions";
-import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";

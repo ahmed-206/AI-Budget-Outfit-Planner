@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Budget Outfit Planner 🚀
+
+An innovative E-commerce platform that redefines fashion shopping. This project transforms the traditional shopping experience by integrating an **AI-powered Outfit Planner** that suggests complete looks based on the user's budget and occasion.
+
+## 🌟 Features
+
+- **AI Budget Planner:** Users input their budget and occasion (e.g., Wedding, Casual, Business), and the AI suggests the best outfit combinations from the store.
+- **Full E-commerce Functionality:** Product browsing, shopping cart, and secure checkout.
+- **Admin Dashboard:** Comprehensive management for products, inventory, and sales analytics.
+- **Secure Authentication:** User management and protected routes.
+- **Modern UI/UX:** Fully responsive and clean interface.
+
+## 🛠️ Tech Stack
+
+- **Framework:** [Next.js 16](https://nextjs.org/) (App Router)
+- **Authentication:** [Clerk](https://clerk.com/)
+- **Database & ORM:** [Prisma](https://www.prisma.io/)
+- **Payments:** [Stripe](https://stripe.com/)
+- **Styling:** Tailwind CSS
+- **AI Integration:** OpenAI API / LangChain (Planned/In Progress)
+
+## 🚧 Roadmap (Under Development)
+
+- [x] Initial E-commerce setup & Storefront.
+- [x] Admin Dashboard integration.
+- [ ] **Next Step:** Integration of OpenAI for smart outfit suggestions.
+  
+  
+
+## 🚀 Getting Started
+
+1. **Clone the repository:**
+   ```bash
+   git clone
 
 ## Getting Started
 
 First, run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
+
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

@@ -97,7 +97,7 @@ function CartSheet({ initialCart }: { initialCart?: CartWithItems | null }) {
                 <Button variant="ghost" size="icon" className="relative">
                     <ShoppingCart className="h-5 w-5" />
                     {itemCount > 0 && (
-                        <span className="absolute -top-1 -right-1 h-4 w-4 bg-emerald-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center pointer-events-none">
+                        <span className="absolute -top-1 -right-1 h-4 w-4 bg-brand-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center pointer-events-none">
                             {itemCount}
                         </span>
                     )}
@@ -177,7 +177,7 @@ function CartSheet({ initialCart }: { initialCart?: CartWithItems | null }) {
                                 <span>${calculateTotal().toFixed(2)}</span>
                             </div>
                             <Button
-                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-12 text-lg font-bold shadow-lg"
+                                className="w-full bg-brand-primary/90 hover:bg-brand-primary text-white h-12 text-lg font-bold shadow-lg"
                                 onClick={handleCheckout}
                                 disabled={isPending}
                             >

@@ -27,13 +27,13 @@ async function AdminPage() {
                         <div className="text-sm text-muted-foreground mt-1">Welcome, Admin</div>
                     </div>
                     <div className="flex items-center gap-4">
-                        <Link href="/admin/products" className="text-sm text-emerald-700 hover:underline font-medium">
+                        <Link href="/admin/products" className="text-sm text-brand-secondary hover:underline font-medium">
                             Manage Products
                         </Link>
-                        <Link href="/admin/orders" className="text-sm text-emerald-700 hover:underline font-medium">
+                        <Link href="/admin/orders" className="text-sm text-brand-secondary hover:underline font-medium">
                             View Orders
                         </Link>
-                        <AddProductModal />
+                        
                     </div>
                 </div>
 

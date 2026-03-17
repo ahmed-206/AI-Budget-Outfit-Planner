@@ -57,11 +57,11 @@ export default function AddProductModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        <Button className="gap-2">
+        <Button className="gap-2 bg-brand-primary/90 hover:bg-brand-primary">
           <Plus className="w-4 h-4" /> Add Product
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Product</DialogTitle>
         </DialogHeader>
@@ -156,11 +156,11 @@ export default function AddProductModal() {
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
-              className="mr-2"
+              className="mr-2 text-brand-primary"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isPending} className="bg-brand-primary/80 hover:bg-brand-primary">
               {isPending ? "Adding..." : "Add Product"}
             </Button>
           </div>

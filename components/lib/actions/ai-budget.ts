@@ -4,26 +4,27 @@ import { z } from "zod";
 import prisma from "@/lib/prisma";
 
 // Define the schema for the input
-const budgetSchema = z.object({
+const outfitSchema = z.object({
   budget: z.number().min(1, "Budget must be at least $1"),
-  days: z.number().min(1, "Days must be at least 1").max(30, "Max 30 days"),
-  people: z.number().min(1, "People must be at least 1"),
+  occasion: z.string().min(1, "Please select an occasion"),
+  style: z.string().min(1, "Please select a style preference"),
 });
 
-export type BudgetState = {
+export type OutfitState = {
   message: string;
   success: boolean;
   error?: {
     budget?: string[];
-    days?: string[];
-    people?: string[];
+    occasion?: string[];
+    style?: string[];
   };
   plan?: {
-    meals: Array<{
-      day: number;
-      mealType: string;
-      name: string;
-      ingredients: string[];
+    outfits: Array<{
+      name: string; // اسم الطقم (مثلاً: Casual Summer Look)
+      category: string; // التصنيف (Formal, Casual...)
+      items: string[]; // قطع الملابس المكونة للطقم
+      estimatedPrice: number;
+      matchScore: number; // نسبة ملاءمة الطقم للمناسبة
     }>;
     matchedProducts: Array<{
       id: string;
@@ -36,19 +37,19 @@ export type BudgetState = {
   };
 };
 
-export async function createBudgetPlan(
-  prevState: BudgetState,
+export async function createOutfitPlan(
+  prevState: OutfitState,
   formData: FormData,
-): Promise<BudgetState> {
+): Promise<OutfitState> {
   const budget = Number(formData.get("budget"));
-  const days = Number(formData.get("days"));
-  const people = Number(formData.get("people"));
+  const occasion = formData.get("occasion") as string;
+  const style = formData.get("style") as string;
 
   // Validate inputs
   //لماذا safeParse ؟
   // لا ترمي error
   // تعيد نتيجة تحتوي success أو failure.
-  const validation = budgetSchema.safeParse({ budget, days, people });
+  const validation = outfitSchema.safeParse({ budget, occasion, style });
 
   if (!validation.success) {
     return {
@@ -60,14 +61,14 @@ export async function createBudgetPlan(
 
   // 0. Fetch available products from DB to feed into AI
 
-  const availableProducts = await prisma.product.findMany({
-    select: { id: true, name: true, price: true, category: true, image: true },
+ const availableProducts = await prisma.product.findMany({
+    select: { id: true, name: true, price: true, category: { select: { name: true } }, images: true },
   });
 
   // تحويل المنتجات إلى نص
   // الذكاء الاصطناعي يفهم النص.
-  const productListString = availableProducts
-    .map((p) => `- ${p.name} ($${Number(p.price).toFixed(2)})`)
+ const productListString = availableProducts
+    .map((p) => `- ${p.name} ($${Number(p.price).toFixed(2)}) [Category: ${p.category?.name}]`)
     .join("\n");
 
   // Real AI Call
@@ -78,33 +79,34 @@ export async function createBudgetPlan(
     const result = await generateObject({
       model: openai("gpt-4o"),
       schema: z.object({
-        meals: z.array(
+        outfits: z.array(
           z.object({
-            day: z.number(),
-            mealType: z.string(),
             name: z.string(),
-            ingredients: z.array(z.string()),
+            category: z.string(),
+            items: z.array(z.string()),
+            estimatedPrice: z.number(),
+            matchScore: z.number().max(100),
           }),
         ),
 
         // We ask the AI to return the Exact Product Names from our list
         shoppingList: z.array(z.string()),
       }),
-      system: `You are an expert AI Budget Meal Planner.
-            Your goal is to create a nutritious and delicious meal plan for ${people} people for ${days} days, STRICTLY adhering to a budget of $${budget} (or as close as possible).
+      system: `You are a professional AI Fashion Stylist.
+            Your goal is to curate a selection of outfits for a customer based on their budget of $${budget}, for a ${occasion} occasion, and a ${style} style preference. (or as close as possible).
             
-            **CRITICAL**: You must ONLY use ingredients that are available in our store.
+           **CRITICAL**: You must ONLY suggest products that exist in our inventory.
             Here is the list of available products:
             ${productListString}
 
             Guidelines:
-            1. **Budget First**: Check the prices in the list. Do not exceed $${budget}.
-            2. **Strict Inventory**: If a meal needs "Chicken" but we only have "Wild Caught Salmon", you must plan a Salmon meal or a vegetarian meal using available items (like Eggs/Quinoa). DO NOT invent ingredients.
-            3. **Efficient**: Reuse ingredients across meals.
-            4. **Shopping List**: The 'shoppingList' array must contain the EXACT names of the products from the provided list that are needed for the meals.
+            1. **Budget Adherence**: The total cost of the 'shoppingList' must not exceed $${budget}.
+            2. **Style Consistency**: All suggested outfits must match the '${style}' aesthetic and be appropriate for '${occasion}'.
+            3. **Inventory Integrity**: Do not invent clothing items. If we don't have a "Silk Tie", suggest an alternative from the list or omit it.
+            4. **Shopping List**: This must contain the EXACT names of products from the list provided above.
 
-            Output strictly valid JSON matching the schema.`,
-      prompt: `Create a plan for ${days} days for ${people} people with a max budget of $${budget}.`,
+            Output strictly valid JSON.`,
+      prompt: `Curate a style plan for a ${occasion} occasion with a ${style} style. Total budget: $${budget}.`,
     });
 
     const aiResponse = result.object;
@@ -115,7 +117,6 @@ export async function createBudgetPlan(
       name: string;
       price: number;
       image: string;
-      category: string;
     }[] = [];
     let totalCost = 0;
 
@@ -126,8 +127,10 @@ export async function createBudgetPlan(
       if (product) {
         if (!matchedProducts.find((p) => p.id === product.id)) {
           matchedProducts.push({
-            ...product,
+            id: product.id,
+            name: product.name,
             price: Number(product.price),
+            image: product.images[0] ?? "",
           });
           totalCost += Number(product.price);
         }
@@ -141,8 +144,10 @@ export async function createBudgetPlan(
           !matchedProducts.find((p) => p.id === fuzzyProduct.id)
         ) {
           matchedProducts.push({
-            ...fuzzyProduct,
+            id: fuzzyProduct.id,
+            name: fuzzyProduct.name,
             price: Number(fuzzyProduct.price),
+            image: fuzzyProduct.images[0] ?? "",
           });
           totalCost += Number(fuzzyProduct.price);
         }
@@ -150,21 +155,21 @@ export async function createBudgetPlan(
     }
 
     return {
-      success: true,
-      message: "Plan generated successfully!",
+     success: true,
+      message: "Style plan generated successfully!",
       plan: {
-        meals: aiResponse.meals,
+        outfits: aiResponse.outfits,
         matchedProducts,
         totalCost,
         remainingBudget: budget - totalCost,
       },
     };
   } catch (error) {
-    console.error("AI/DB Error:", error);
+    console.error("AI Stylist Error:", error);
     return {
       success: false,
       message:
-        "Failed to generate plan. Please check your API key and try again.",
+        "Our stylist is busy right now. Please try again in a moment.",
     };
   }
 }

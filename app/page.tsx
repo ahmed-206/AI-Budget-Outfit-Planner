@@ -125,7 +125,7 @@ async function Home() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {featuredProducts.map((product) => (
           <div key={product.id} className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-gray-100 flex flex-col">
-            <Link href={`/products/${product.id}`} className="relative aspect-[3/4] overflow-hidden bg-gray-100">
+            <Link href={`/products/${product.id}`} className="relative aspect-3/4 overflow-hidden bg-gray-100">
               <Image
                 src={product.images?.[0] || "/placeholder.jpg"}
                 alt={product.name}

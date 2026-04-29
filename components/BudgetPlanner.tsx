@@ -138,7 +138,7 @@ function BudgetPlanner() {
                     AI Recommended Outfits
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-6 grid gap-4 md:grid-cols-2">
+                <CardContent className="p-6 grid gap-4 md:grid-cols-2 ">
                   {state.plan.outfits.map(
                     (
                       outfit: NonNullable<
@@ -148,7 +148,7 @@ function BudgetPlanner() {
                     ) => (
                       <div
                         key={idx}
-                        className="p-4 bg-white rounded-2xl border border-[#9EC5AB]/20 hover:border-[#32746D] transition-all shadow-sm group"
+                        className="mx-auto p-4 bg-white rounded-2xl border border-[#9EC5AB]/20 hover:border-[#32746D] transition-all shadow-sm group"
                       >
                         <div className="flex justify-between items-start mb-3">
                           <span className="font-black text-[#104F55] group-hover:text-[#32746D] transition-colors">

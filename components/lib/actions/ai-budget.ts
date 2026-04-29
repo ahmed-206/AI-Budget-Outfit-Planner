@@ -3,6 +3,7 @@
 import { z } from "zod";
 import prisma from "@/lib/prisma";
 
+const IS_MOCK_MODE = true;
 // Define the schema for the input
 const outfitSchema = z.object({
   budget: z.number().min(1, "Budget must be at least $1"),
@@ -36,6 +37,7 @@ export type OutfitState = {
     remainingBudget: number;
   };
 };
+
 
 export async function createOutfitPlan(
   prevState: OutfitState,
@@ -71,6 +73,44 @@ export async function createOutfitPlan(
     .map((p) => `- ${p.name} ($${Number(p.price).toFixed(2)}) [Category: ${p.category?.name}]`)
     .join("\n");
 
+    if (IS_MOCK_MODE) {
+    // محاكاة تأخير السيرفر (ثانية ونصف)
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    // اختيار أول منتجين بشكل عشوائي من قاعدة بياناتك للمحاكاة
+    const sampleProducts = availableProducts.slice(0, 2);
+    const shoppingList = sampleProducts.map(p => p.name);
+    
+    let simulatedTotal = 0;
+    const matchedProducts = sampleProducts.map(p => {
+        simulatedTotal += Number(p.price);
+        return {
+            id: p.id,
+            name: p.name,
+            price: Number(p.price),
+            image: p.images[0] ?? "/placeholder.jpg"
+        }
+    });
+
+    return {
+      success: true,
+      message: "(Demo Mode) Style plan generated from your actual database products!",
+      plan: {
+        outfits: [
+          {
+            name: `${style.charAt(0).toUpperCase() + style.slice(1)} ${occasion} Set`,
+            category: occasion,
+            items: shoppingList,
+            estimatedPrice: simulatedTotal,
+            matchScore: 98,
+          },
+        ],
+        matchedProducts,
+        totalCost: simulatedTotal,
+        remainingBudget: budget - simulatedTotal,
+      },
+    };
+  }
   // Real AI Call
   try {
     const { openai } = await import("@ai-sdk/openai");

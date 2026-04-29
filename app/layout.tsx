@@ -3,12 +3,12 @@ import { Geist, Geist_Mono, Noto_Sans } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import Navbar  from '../components/navbar'
+import Navbar from "../components/layout/navbar";
 import { UserSync } from "@/components/user.sync";
 import { Toaster } from "sonner";
 import { getCart } from "@/components/lib/actions/cart";
-import NextTopLoader from 'nextjs-toploader';
-const notoSans = Noto_Sans({variable:'--font-sans'});
+import NextTopLoader from "nextjs-toploader";
+const notoSans = Noto_Sans({ variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,27 +30,26 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
   const cart = await getCart();
   return (
-   <ClerkProvider>
-      {/* 1. الـ html يجب أن يكون الغلاف الأول */}
+    <ClerkProvider>
       <html lang="en" className={cn("font-sans", notoSans.variable)}>
-        {/* 2. الـ body يجب أن يحتوي على كل شيء يظهر أو يعمل في المتصفح */}
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <NextTopLoader 
-            color="#104F55" 
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <NextTopLoader
+            color="#104F55"
             initialPosition={0.08}
             crawlSpeed={200}
             height={3}
-            showSpinner={false} 
+            showSpinner={false}
             easing="ease"
           />
           <Navbar cart={cart} />
-          <UserSync /> 
+          <UserSync />
           <main>
-             {children}
-             <Toaster />
+            {children}
+            <Toaster />
           </main>
         </body>
       </html>

@@ -23,7 +23,7 @@ export function CategoryCarousel({ categories }: CategoryCarouselProps) {
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10 px-1 gap-4">
                 <div className="text-center md:text-left">
-                    <h2 className="text-3xl font-bold text-brand-primary tracking-tight">Shop by Category</h2>
+                    <h2 className="text-3xl font-bold text-primary tracking-tight">Shop by Category</h2>
                     <p className="text-gray-500 mt-2">Discover our curated collections for every occasion.</p>
                 </div>
                 
@@ -57,10 +57,10 @@ export function CategoryCarousel({ categories }: CategoryCarouselProps) {
                                         
                                         {/* Category Name */}
                                         <div className="mt-6 text-center">
-                                            <h3 className="font-bold text-brand-primary group-hover:text-brand-secondary transition-colors text-lg">
+                                            <h3 className="font-bold text-primary group-hover:text-primary/80 transition-colors text-lg">
                                                 {category.name}
                                             </h3>
-                                            <div className="w-0 group-hover:w-12 h-0.5 bg-brand-secondary mx-auto mt-2 transition-all duration-500" />
+                                            <div className="w-0 group-hover:w-12 h-0.5 bg-primary mx-auto mt-2 transition-all duration-500" />
                                         </div>
                                     </CardContent>
                                 </Card>
